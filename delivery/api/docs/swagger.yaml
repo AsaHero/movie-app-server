@@ -1,0 +1,477 @@
+definitions:
+  models.CreateMovieRequest:
+    properties:
+      duration_minutes:
+        maximum: 500
+        minimum: 1
+        type: integer
+      genres:
+        items:
+          type: integer
+        type: array
+      plot:
+        type: string
+      poster_url:
+        type: string
+      release:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 2
+        type: string
+      trailer_url:
+        type: string
+    required:
+    - duration_minutes
+    - genres
+    - poster_url
+    - release
+    - title
+    - trailer_url
+    type: object
+  models.Empty:
+    type: object
+  models.Gener:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.GetAllGenresResponse:
+    properties:
+      genres:
+        items:
+          $ref: '#/definitions/models.Gener'
+        type: array
+    type: object
+  models.GetAllMoviesResponse:
+    properties:
+      movies:
+        items:
+          $ref: '#/definitions/models.Movie'
+        type: array
+      total:
+        type: integer
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Movie:
+    properties:
+      created_at:
+        type: string
+      duration_minutes:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      plot:
+        type: string
+      poster_url:
+        type: string
+      release:
+        type: string
+      title:
+        type: string
+      trailer_url:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  models.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  models.UpdateMovieRequest:
+    properties:
+      duration_minutes:
+        maximum: 500
+        minimum: 1
+        type: integer
+      genres:
+        items:
+          type: integer
+        type: array
+      plot:
+        type: string
+      poster_url:
+        type: string
+      release:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 2
+        type: string
+      trailer_url:
+        type: string
+    required:
+    - duration_minutes
+    - genres
+    - poster_url
+    - release
+    - title
+    - trailer_url
+    type: object
+  outerr.ErrorResponse:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Documentation for "Where Is My City" API
+  termsOfService: http://swagger.io/terms/
+  title: Where Is My City
+  version: 0.0.1
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      summary: Refresh token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      parameters:
+      - description: Register request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      summary: Register
+      tags:
+      - auth
+  /movies:
+    get:
+      consumes:
+      - application/json
+      description: Get all movies
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - collectionFormat: csv
+        description: Filter by genres
+        in: query
+        items:
+          type: string
+        name: genres
+        type: array
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Order by field
+        enum:
+        - title
+        - release
+        - created_at
+        in: query
+        name: order_by
+        type: string
+      - description: Order direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order_dir
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetAllMoviesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all movies
+      tags:
+      - Movies
+    post:
+      consumes:
+      - application/json
+      description: Create movie
+      parameters:
+      - description: Create movie request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Movie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create movie
+      tags:
+      - Movies
+  /movies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete movie
+      parameters:
+      - description: Movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Empty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete movie
+      tags:
+      - Movies
+    get:
+      consumes:
+      - application/json
+      description: Get movie by id
+      parameters:
+      - description: Movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Movie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get movie by id
+      tags:
+      - Movies
+    put:
+      consumes:
+      - application/json
+      description: Update movie
+      parameters:
+      - description: Movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update movie request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Empty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update movie
+      tags:
+      - Movies
+  /movies/genres:
+    get:
+      consumes:
+      - application/json
+      description: Get all genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetAllGenresResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outerr.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all genres
+      tags:
+      - Genres
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'Basic Auth "Authorization: Basic <base64 encoded username:password>"'
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+swagger: "2.0"
